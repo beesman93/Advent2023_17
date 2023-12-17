@@ -25,6 +25,7 @@ for (int row = 0; row < ROWS; row++)
 }
 
 solve(false);
+//solve(true);
 void solve(bool part2)
 {
     //bestTravel for each node from each dirrection with dirCount
