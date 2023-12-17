@@ -25,7 +25,7 @@ for (int row = 0; row < ROWS; row++)
 }
 
 solve(false);
-//solve(true);
+solve(true);
 void solve(bool part2)
 {
     //bestTravel for each node from each dirrection with dirCount
@@ -40,7 +40,7 @@ void solve(bool part2)
     }
     void popNext(ref PriorityQueue<node, int> pQ, ref Dictionary<node, int> bestTravel)
     {
-        pQ.TryDequeue(out node weAt, out int travel_time);
+        pQ.TryDequeue(out node weAt,out int travel_time);
 
         if (bestTravel.ContainsKey(weAt))
             return; //we found better before -- new path dequeued
@@ -49,16 +49,27 @@ void solve(bool part2)
 
         //QUEUE new paths forward:
         HashSet<DIR> newDirrections = new() { DIR.UP, DIR.DOWN, DIR.LEFT, DIR.RIGHT };
-        newDirrections.Remove(reverse(weAt.D));//can't travel backwards
-        if (weAt.SameDir >= 3) newDirrections.Remove(weAt.D);//can't travel this dirrection anymore
+        if(weAt.Dir!=DIR.NONE)newDirrections.Remove(reverse(weAt.Dir));//can't travel backwards
+        //if (part2 && weAt.Dir != DIR.NONE && weAt.SameDir < 4) newDirrections = new() { weAt.Dir };//we have to travel same dirrection in part2
+        if (weAt.SameDir >= (part2?10:3)) newDirrections.Remove(weAt.Dir);//can't travel this dirrection anymore
         foreach (DIR dir in newDirrections)
         {
-            int row = weAt.Row + rowModifier(weAt.D);
-            int col = weAt.Col + colModifier(weAt.D);
+            int travelHowMuch = 1;
+            if (part2 && dir != weAt.Dir)
+                travelHowMuch = 4;
+            int row = weAt.Row + rowModifier(dir,travelHowMuch);
+            int col = weAt.Col + colModifier(dir,travelHowMuch);
             if (row >= 0 && row < ROWS && col >= 0 && col < COLS)
             {
-                int sameDir = dir == weAt.D ? weAt.SameDir + 1 : 1;
-                pQ.Enqueue(new(row, col, dir, sameDir), travel_time + map[row][col]);
+                int sameDir = dir == weAt.Dir ? weAt.SameDir + travelHowMuch : travelHowMuch;
+                int costOfTravel = travel_time;
+                for(int i=1;i<=travelHowMuch;i++)
+                {
+                    int rowAddition = weAt.Row + rowModifier(dir, i);
+                    int colAddition = weAt.Col + colModifier(dir, i);
+                    costOfTravel += map[rowAddition][colAddition];
+                }
+                pQ.Enqueue(new(row, col, dir, sameDir), costOfTravel);
             }
         }
     }
@@ -68,24 +79,24 @@ void solve(bool part2)
         if (bestTravel.Key.Row == ROWS - 1 && bestTravel.Key.Col == COLS - 1)
             if (bestTravel.Value < min)
                 min = bestTravel.Value;
-    Console.WriteLine(min - map[0][0]);
+    Console.WriteLine(min);
 }
 
-short rowModifier(DIR dir)
+int rowModifier(DIR dir,int val)
 {
     if (dir == DIR.DOWN)
-        return 1;
+        return val;
     if (dir == DIR.UP)
-        return -1;
+        return -val;
     return 0;
 }
 
-short colModifier(DIR dir)
+int colModifier(DIR dir, int val)
 {
     if (dir == DIR.RIGHT)
-        return 1;
+        return val;
     if (dir == DIR.LEFT)
-        return -1;
+        return -val;
     return 0;
 }
 DIR reverse(DIR dir)
@@ -112,8 +123,8 @@ struct node
 {
     public int Row;
     public int Col;
-    public DIR D;
+    public DIR Dir;
     public int SameDir;
     public node(int row, int col, DIR d, int sameDir) =>
-        (Row, Col, D, SameDir) = (row, col, d, sameDir);
+        (Row, Col, Dir, SameDir) = (row, col, d, sameDir);
 }
