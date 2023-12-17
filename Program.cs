@@ -23,8 +23,8 @@ solve(true);//part2
 void solve(bool part2)
 {
     Stopwatch sw = Stopwatch.StartNew();
-    Dictionary<(int row,int col,DIR dir,int dirCount), int> bestTravels = new();
-    PriorityQueue<(int row, int col, DIR dir, int dirCount), int> pQ = new();
+    Dictionary<node, int> bestTravels = new();
+    PriorityQueue<node, int> pQ = new();
     pQ.Enqueue(new(0, 0, DIR.NONE, 0), 0);
     while (pQ.Count > 0)
     {
@@ -98,4 +98,16 @@ enum DIR : short
     LEFT = 2,
     RIGHT = 3,
     NONE = 5
+}
+
+readonly record struct node
+{
+    public readonly int row { get; init; }
+    public readonly int col { get; init; }
+    public readonly DIR dir { get; init; }
+    public readonly int dirCount { get; init; }
+
+    public node(int row, int col, DIR dir, int dirCount) =>
+        (this.row, this.col, this.dir, this.dirCount) = (row, col, dir, dirCount);
+
 }
