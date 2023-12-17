@@ -32,7 +32,6 @@ void solve(bool part2)
         if (bestTravels.ContainsKey(weAt))
             continue; //we found better before -- new path dequeued
         bestTravels[weAt] = travel_time;
-        //QUEUE new paths forward:
         foreach (var dir in cardinalDIRs)
         {
             if (dir == reverse(weAt.dir))
@@ -52,7 +51,7 @@ void solve(bool part2)
                     int colAddition = weAt.col + colModifier(dir, i);
                     costOfTravel += map[rowAddition][colAddition];
                 }
-                pQ.Enqueue(new(row, col, dir, sameDir), costOfTravel);
+                pQ.Enqueue(new(row, col, dir, sameDir), costOfTravel);//QUEUE new path
             }
         }
     }
