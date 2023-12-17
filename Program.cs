@@ -15,6 +15,7 @@ int solve(bool part2)
     (int row,int col)[] cardinalDIRs = new[]{(0,1),(1,0),(-1,0),(0,-1)};
     while (pQ.TryDequeue(out var weAt, out int travel_time))
     {
+        if (weAt.row == map.Count - 1 && weAt.col == map[weAt.row].Count - 1) return travel_time;
         if (dists.ContainsKey(weAt)) continue;//found better or eq before
         dists[weAt] = travel_time;
         foreach (var dir in cardinalDIRs)
@@ -33,6 +34,5 @@ int solve(bool part2)
                 pQ.Enqueue(new(row, col, dir, dirCount), costOfTravel);//QUEUE new path
             }
         }
-    }
-    return dists.Where(d => d.Key.row==map.Count-1 && d.Key.col==map[d.Key.row].Count-1).Min(d => d.Value);
+    }return -1;
 }
