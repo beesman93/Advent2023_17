@@ -22,8 +22,8 @@ solve(true);//part2
 void solve(bool part2)
 {
     Stopwatch sw = Stopwatch.StartNew();
-    Dictionary<node, int> bestTravels = new();
-    PriorityQueue<node, int> pQ = new();
+    Dictionary<(int row, int col, DIR dir, int dirCount), int> bestTravels = new();
+    PriorityQueue<(int row, int col, DIR dir, int dirCount), int> pQ = new();
     pQ.Enqueue(new(0, 0, DIR.NONE, 0), 0);
     DIR[] cardinalDIRs = new DIR[] { DIR.RIGHT,DIR.DOWN,DIR.LEFT,DIR.UP };
     while (pQ.Count > 0)
@@ -100,15 +100,4 @@ enum DIR : short
     LEFT = 2,
     RIGHT = 3,
     NONE = 5
-}
-
-readonly record struct node
-{
-    public readonly int row;
-    public readonly int col;
-    public readonly DIR dir;
-    public readonly int dirCount;
-    public node(int row, int col, DIR dir, int dirCount) =>
-        (this.row, this.col, this.dir, this.dirCount) = (row, col, dir, dirCount);
-
 }
