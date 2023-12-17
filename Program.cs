@@ -13,12 +13,11 @@ using (StreamReader reader = new(args[0]))
     }
 }
 
-ROWS = map.Count;
-COLS = map.First().Count;
+int ROWS = map.Count;
+int COLS = map.First().Count;
 
 solve(false);//part1
 solve(true);//part2
-
 
 void solve(bool part2)
 {
@@ -26,9 +25,10 @@ void solve(bool part2)
     Dictionary<node, int> bestTravels = new();
     PriorityQueue<node, int> pQ = new();
     pQ.Enqueue(new(0, 0, DIR.NONE, 0), 0);
+    DIR[] cardinalDIRs = new DIR[] { DIR.RIGHT,DIR.DOWN,DIR.LEFT,DIR.UP };
     while (pQ.Count > 0)
     {
-        pQ.TryDequeue(out var weAt,out int travel_time);
+        pQ.TryDequeue(out var weAt, out int travel_time);
         if (bestTravels.ContainsKey(weAt))
             continue; //we found better before -- new path dequeued
         bestTravels[weAt] = travel_time;
@@ -111,11 +111,4 @@ readonly record struct node
     public node(int row, int col, DIR dir, int dirCount) =>
         (this.row, this.col, this.dir, this.dirCount) = (row, col, dir, dirCount);
 
-}
-
-partial class Program
-{
-    private static readonly DIR[] cardinalDIRs = new DIR[] { DIR.UP, DIR.DOWN, DIR.LEFT, DIR.RIGHT };
-    private static int COLS;
-    private static int ROWS;
 }
