@@ -3,10 +3,9 @@ using (StreamReader reader = new(args[0]))
     while(!reader.EndOfStream)
     {
         map.Add(new());
-        foreach (char c in reader.ReadLine())
+        foreach (char c in reader.ReadLine()??"")
             map.Last().Add(c - '0');
     }
-
 new List<bool> { false, true }.ForEach(b => Console.WriteLine($"part{(b?2:1)}: {solve(b)}"));
 int solve(bool part2)
 {
