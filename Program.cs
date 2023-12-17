@@ -22,33 +22,32 @@ solve(true);//part2
 void solve(bool part2)
 {
     Stopwatch sw = Stopwatch.StartNew();
-    Dictionary<(int row, int col, DIR dir, int dirCount), int> bestTravels = new();
-    PriorityQueue<(int row, int col, DIR dir, int dirCount), int> pQ = new();
-    pQ.Enqueue(new(0, 0, DIR.NONE, 0), 0);
-    DIR[] cardinalDIRs = new DIR[] { DIR.RIGHT,DIR.DOWN,DIR.LEFT,DIR.UP };
-    while (pQ.Count > 0)
+    Dictionary<(int row, int col, (int row, int col) dir, int dirCount), int> bestTravels = new();
+    PriorityQueue<(int row, int col, (int row, int col) dir, int dirCount), int> pQ = new();
+    pQ.Enqueue(new(0, 0, (0,0), 0), 0);
+    (int row,int col)[] cardinalDIRs = new[] {(0,1),(1,0),(0,1),(0,-1)};
+    while (pQ.TryDequeue(out var weAt, out int travel_time))
     {
-        pQ.TryDequeue(out var weAt, out int travel_time);
         if (bestTravels.ContainsKey(weAt))
-            continue; //we found better before -- new path dequeued
+            continue; //we found better before -- new (worse) path dequeued, go next
         bestTravels[weAt] = travel_time;
         foreach (var dir in cardinalDIRs)
         {
             if (dir == reverse(weAt.dir))
-                continue;
+                continue;//don't reverse
             if (dir==weAt.dir && weAt.dirCount >= (part2 ? 10 : 3))
-                continue;
-            int travelHowMuch = (part2 && dir != weAt.dir) ? 4 : 1;
-            int row = weAt.row + rowModifier(dir,travelHowMuch);
-            int col = weAt.col + colModifier(dir,travelHowMuch);
+                continue;//don'T continue same dirrection after 3(p1) / 10(p2)
+            int travelHowMuch = (part2 && dir != weAt.dir) ? 4 : 1; //step by step p1/p2 same dir, jump 4 p2 new dirrection
+            int row = weAt.row + travelHowMuch * dir.row;
+            int col = weAt.col + travelHowMuch * dir.col;
             if (row >= 0 && row < ROWS && col >= 0 && col < COLS)
             {
                 int sameDir = (dir == weAt.dir) ? weAt.dirCount + travelHowMuch : travelHowMuch;
                 int costOfTravel = travel_time;
                 for(int i=1;i<=travelHowMuch;i++)
                 {
-                    int rowAddition = weAt.row + rowModifier(dir, i);
-                    int colAddition = weAt.col + colModifier(dir, i);
+                    int rowAddition = weAt.row + i * dir.row;
+                    int colAddition = weAt.col + i * dir.col;
                     costOfTravel += map[rowAddition][colAddition];
                 }
                 pQ.Enqueue(new(row, col, dir, sameDir), costOfTravel);//QUEUE new path
@@ -60,44 +59,10 @@ void solve(bool part2)
         if (bestTravel.Key.row == ROWS - 1 && bestTravel.Key.col == COLS - 1)
             if (bestTravel.Value < min)
                 min = bestTravel.Value;
+    sw.Stop();
     Console.WriteLine($"part {(part2?2:1)}: {min}\t\t~{sw.ElapsedMilliseconds}ms");
 }
-
-int rowModifier(DIR dir, int val)
+(int row, int col) reverse((int row,int col) dir)
 {
-    if (dir == DIR.DOWN)
-        return val;
-    if (dir == DIR.UP)
-        return -val;
-    return 0;
-}
-
-int colModifier(DIR dir, int val)
-{
-    if (dir == DIR.RIGHT)
-        return val;
-    if (dir == DIR.LEFT)
-        return -val;
-    return 0;
-}
-
-DIR reverse(DIR dir)
-{
-    return dir switch
-    {
-        DIR.UP => DIR.DOWN,
-        DIR.DOWN => DIR.UP,
-        DIR.LEFT => DIR.RIGHT,
-        DIR.RIGHT => DIR.LEFT,
-        _ => DIR.NONE
-    };
-}
-
-enum DIR : short
-{
-    UP = 0,
-    DOWN = 1,
-    LEFT = 2,
-    RIGHT = 3,
-    NONE = 5
+    return (-dir.row,-dir.col);
 }
