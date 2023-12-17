@@ -25,7 +25,7 @@ void solve(bool part2)
     Dictionary<(int row, int col, (int row, int col) dir, int dirCount), int> bestTravels = new();
     PriorityQueue<(int row, int col, (int row, int col) dir, int dirCount), int> pQ = new();
     pQ.Enqueue(new(0, 0, (0,0), 0), 0);
-    (int row,int col)[] cardinalDIRs = new[] {(0,1),(1,0),(0,1),(0,-1)};
+    (int row,int col)[] cardinalDIRs = new[] {(0,1),(1,0),(-1,0),(0,-1)};
     while (pQ.TryDequeue(out var weAt, out int travel_time))
     {
         if (bestTravels.ContainsKey(weAt))
@@ -60,6 +60,7 @@ void solve(bool part2)
             if (bestTravel.Value < min)
                 min = bestTravel.Value;
     sw.Stop();
+    Debug.Assert(part2 ? min == 1157 : min == 936);
     Console.WriteLine($"part {(part2?2:1)}: {min}\t\t~{sw.ElapsedMilliseconds}ms");
 }
 (int row, int col) reverse((int row,int col) dir)
