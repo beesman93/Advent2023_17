@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.InteropServices;
 
 List<List<int>> map = new() { new() };
 using (StreamReader reader = new(args[0]))
@@ -14,11 +12,13 @@ using (StreamReader reader = new(args[0]))
             map.Last().Add(c - '0');
     }
 }
-int ROWS = map.Count;
-int COLS = map.First().Count;
+
+ROWS = map.Count;
+COLS = map.First().Count;
 
 solve(false);//part1
 solve(true);//part2
+
 
 void solve(bool part2)
 {
@@ -33,11 +33,12 @@ void solve(bool part2)
             continue; //we found better before -- new path dequeued
         bestTravels[weAt] = travel_time;
         //QUEUE new paths forward:
-        HashSet<DIR> newDirrections = new() { DIR.UP, DIR.DOWN, DIR.LEFT, DIR.RIGHT };
-        newDirrections.Remove(reverse(weAt.dir));//can't travel backwards
-        if (weAt.dirCount >= (part2?10:3)) newDirrections.Remove(weAt.dir);//can't travel this dirrection anymore
-        foreach (DIR dir in newDirrections)
+        foreach (var dir in cardinalDIRs)
         {
+            if (dir == reverse(weAt.dir))
+                continue;
+            if (dir==weAt.dir && weAt.dirCount >= (part2 ? 10 : 3))
+                continue;
             int travelHowMuch = (part2 && dir != weAt.dir) ? 4 : 1;
             int row = weAt.row + rowModifier(dir,travelHowMuch);
             int col = weAt.col + colModifier(dir,travelHowMuch);
@@ -63,7 +64,7 @@ void solve(bool part2)
     Console.WriteLine($"part {(part2?2:1)}: {min}\t\t~{sw.ElapsedMilliseconds}ms");
 }
 
-int rowModifier(DIR dir,int val)
+int rowModifier(DIR dir, int val)
 {
     if (dir == DIR.DOWN)
         return val;
@@ -80,6 +81,7 @@ int colModifier(DIR dir, int val)
         return -val;
     return 0;
 }
+
 DIR reverse(DIR dir)
 {
     return dir switch
@@ -91,6 +93,7 @@ DIR reverse(DIR dir)
         _ => DIR.NONE
     };
 }
+
 enum DIR : short
 {
     UP = 0,
@@ -102,12 +105,18 @@ enum DIR : short
 
 readonly record struct node
 {
-    public readonly int row { get; init; }
-    public readonly int col { get; init; }
-    public readonly DIR dir { get; init; }
-    public readonly int dirCount { get; init; }
-
+    public readonly int row;
+    public readonly int col;
+    public readonly DIR dir;
+    public readonly int dirCount;
     public node(int row, int col, DIR dir, int dirCount) =>
         (this.row, this.col, this.dir, this.dirCount) = (row, col, dir, dirCount);
 
+}
+
+partial class Program
+{
+    private static readonly DIR[] cardinalDIRs = new DIR[] { DIR.UP, DIR.DOWN, DIR.LEFT, DIR.RIGHT };
+    private static int COLS;
+    private static int ROWS;
 }
