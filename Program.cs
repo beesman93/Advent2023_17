@@ -10,14 +10,14 @@ using (StreamReader reader = new(args[0]))
 new List<bool> { false, true }.ForEach(b => Console.WriteLine($"part{(b?2:1)}: {solve(b)}"));
 int solve(bool part2)
 {
-    Dictionary<(int row, int col, (int row, int col) dir, int dirCount), int> bestTravels = new();
+    Dictionary<(int row, int col, (int row, int col) dir, int dirCount), int> dists = new();
     PriorityQueue<(int row, int col, (int row, int col) dir, int dirCount), int> pQ = new();
     pQ.Enqueue((0,0,(0,0),0),0);
     (int row,int col)[] cardinalDIRs = new[]{(0,1),(1,0),(-1,0),(0,-1)};
     while (pQ.TryDequeue(out var weAt, out int travel_time))
     {
-        if (bestTravels.ContainsKey(weAt)) continue;//found better or eq before
-        bestTravels[weAt] = travel_time;
+        if (dists.ContainsKey(weAt)) continue;//found better or eq before
+        dists[weAt] = travel_time;
         foreach (var dir in cardinalDIRs)
         {
             if (dir == (-weAt.dir.row,-weAt.dir.col)) continue;//don't reverse
@@ -35,10 +35,5 @@ int solve(bool part2)
             }
         }
     }
-    int min = int.MaxValue;
-    foreach (var bestTravel in bestTravels)
-        if (bestTravel.Key.row == map.Count - 1 && bestTravel.Key.col == map[bestTravel.Key.row].Count - 1)
-            if (bestTravel.Value < min)
-                min = bestTravel.Value;
-    return min;
+    return dists.Where(d => d.Key.row==map.Count-1 && d.Key.col==map[d.Key.row].Count-1).Min(d => d.Value);
 }
