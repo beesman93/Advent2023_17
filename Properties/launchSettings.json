@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Advent2023_17": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\beesm\\Documents\\ADVENT_INPUT\\advent17.txt"
+    }
+  }
+}
